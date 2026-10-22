@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Vibe Grid — FlipPlay</title>
+  <meta name="description" content="The Vibe Grid adalah halaman utama FlipPlay: jelajahi 20 judul anime terpopuler dari Kitsu API dengan unified search dan filter aura High Energy, Melancholy, dan Binge Mode." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            musicred: '#fa243c',
+            musicreddeep: '#d6143a',
+            crimson: '#c00020',
+            coral: '#dc4c24',
+            rose: '#e43240',
+            pinkbrand: '#e83273',
+            magenta: '#ff4dc3',
+            aubergine: '#591962',
+            burgundy: '#991e2f',
+            actionblue: '#0066cc',
+            focusblue: '#0071e3',
+            ink: '#1d1d1f',
+            inksecondary: '#6e6e73',
+            inkmuted: '#86868b',
+            parchment: '#f5f5f7',
+            pearl: '#fafafc',
+            cool: '#e8e8ed',
+            hairline: '#d2d2d7',
+            nearblack: '#0d161f',
+          },
+          fontFamily: {
+            display: ['"SF Pro Display"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+            text: ['"SF Pro Text"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+          },
+          borderRadius: {
+            card: '10px',
+            tile: '18px',
+            art: '30px',
+            pill: '980px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: "SF Pro Text", Inter, system-ui, -apple-system, sans-serif; }
+    .font-display { font-family: "SF Pro Display", Inter, system-ui, -apple-system, sans-serif; }
+
+    /* Hero identik dengan landing page index.html */
+    .hero-wash {
+      background:
+        radial-gradient(110% 90% at 18% 18%, #fa243c 0%, #c00020 24%, #e43240 38%, #e83273 52%, #ff4dc3 68%, #591962 100%);
+    }
+    .hero-grain::after {
+      content: "";
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background: radial-gradient(60% 50% at 75% 20%, rgba(255,255,255,.22), transparent 60%),
+                  radial-gradient(50% 45% at 15% 85%, rgba(0,0,0,.35), transparent 65%);
+      mix-blend-mode: overlay;
+    }
+    .display-hero {
+      font-size: clamp(2.75rem, 8vw, 8rem);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+
+    /* Chip aura: state aktif punya specificity lebih tinggi dari utility Tailwind */
+    .chip { transition: background-color .2s, color .2s, border-color .2s, transform .15s, box-shadow .2s; }
+    .chip:active { transform: scale(.96); }
+    .chip.chip-active {
+      background: linear-gradient(135deg,#fa243c,#ff4dc3 55%,#591962) !important;
+      border-color: transparent !important;
+      color: #fff !important;
+      box-shadow: 0 10px 30px -8px rgba(250,36,60,.45);
+    }
+    .chip.chip-active .chip-count { color: rgba(255,255,255,.85) !important; }
+
+    /* Transisi halus untuk kartu yang muncul */
+    .card-in { animation: cardIn .35s ease both; }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    a, button { -webkit-tap-highlight-color: transparent; }
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid #0071e3;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-white text-ink font-text antialiased">
+  <a href="#grid" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-actionblue focus:text-white focus:px-4 focus:py-2 focus:rounded-pill text-sm">Lewati ke grid judul</a>
+
+  <!--  HEADER / NAVBAR (kloningan landing page)  -->
+  <header class="sticky top-0 z-50">
+    <div class="bg-white/90 backdrop-blur border-b border-hairline">
+      <nav aria-label="Navigasi utama" class="max-w-7xl mx-auto px-4 sm:px-6 h-[52px] flex items-center justify-between gap-4">
+        <a href="index.html" class="flex items-center gap-2 shrink-0" aria-label="FlipPlay — beranda">
+          <span aria-hidden="true" class="w-7 h-7 rounded-[10px] grid place-items-center text-white font-display font-bold text-lg leading-none" style="background: linear-gradient(135deg,#fa243c,#ff4dc3 55%,#591962);">F</span>
+          <span class="font-display font-semibold text-[17px] tracking-tight">FlipPlay</span>
+        </a>
+
+        <ul class="hidden md:flex items-center gap-7 text-[15px]">
+          <li><a href="index.html#fitur" class="text-ink/80 hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Fitur</a></li>
+          <li><a href="index.html#streaming" class="text-ink/80 hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Streaming</a></li>
+          <li><a href="index.html#bacaan" class="text-ink/80 hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Bacaan</a></li>
+          <li><a href="vibe-grid.html" aria-current="page" class="text-ink font-semibold hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Vibe Grid</a></li>
+          <li><a href="index.html#harga" class="text-ink/80 hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Harga</a></li>
+          <li><a href="index.html#kontak" class="text-ink/80 hover:text-ink hover:underline underline-offset-8 decoration-2 decoration-musicred">Kontak</a></li>
+        </ul>
+
+        <div class="flex items-center gap-2">
+          <a href="index.html#harga" class="hidden sm:inline-flex items-center justify-center bg-actionblue text-white text-[15px] rounded-pill px-5 py-2 hover:bg-focusblue transition active:scale-95">Masuk</a>
+          <a href="index.html#kontak" class="inline-flex items-center justify-center bg-musicred text-white text-[12px] font-semibold rounded-pill px-3.5 py-2 hover:bg-musicreddeep transition active:scale-95">Coba Gratis</a>
+          <button id="menuBtn" type="button" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-card border border-hairline" aria-expanded="false" aria-controls="mobileMenu" aria-label="Buka menu navigasi">
+            <svg id="iconOpen" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <svg id="iconClose" class="hidden" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- mobile menu -->
+      <nav id="mobileMenu" aria-label="Navigasi seluler" class="md:hidden hidden border-t border-hairline bg-white">
+        <ul class="px-4 py-3 space-y-1 text-[16px]">
+          <li><a href="index.html#fitur" class="block px-3 py-2.5 rounded-card hover:bg-parchment">Fitur</a></li>
+          <li><a href="index.html#streaming" class="block px-3 py-2.5 rounded-card hover:bg-parchment">Streaming</a></li>
+          <li><a href="index.html#bacaan" class="block px-3 py-2.5 rounded-card hover:bg-parchment">Bacaan</a></li>
+          <li><a href="vibe-grid.html" aria-current="page" class="block px-3 py-2.5 rounded-card bg-parchment font-semibold">Vibe Grid</a></li>
+          <li><a href="index.html#harga" class="block px-3 py-2.5 rounded-card hover:bg-parchment">Harga</a></li>
+          <li><a href="index.html#kontak" class="block px-3 py-2.5 rounded-card hover:bg-parchment">Kontak</a></li>
+          <li class="pt-1"><a href="index.html#harga" class="block text-center bg-actionblue text-white rounded-pill px-5 py-2.5">Masuk</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO (gradasi identik dengan landing page) -->
+    <section aria-labelledby="vibe-title" class="hero-wash hero-grain relative overflow-hidden text-white">
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-14 sm:pt-20 sm:pb-20 lg:pt-[80px] lg:pb-[80px] text-center">
+        <p class="inline-flex self-center items-center gap-2 bg-white/15 border border-white/25 backdrop-blur rounded-pill px-4 py-1.5 text-[12px] font-semibold tracking-wide uppercase">
+          <span aria-hidden="true" class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          Top 20 judul terpopuler • Kitsu API
+        </p>
+        <h1 id="vibe-title" class="font-display display-hero mt-6">The Vibe Grid</h1>
+        <p class="mt-5 max-w-2xl mx-auto text-[19px] sm:text-[21px] leading-snug text-white/95 font-display">Ketik judulnya, pilih auranya — grid menyesuaikan seketika.</p>
+        <p class="mt-4 text-[13px] text-white/80">
+          <span id="statTotal" class="font-semibold text-white">–</span> judul tersedia •
+          rata-rata rating <span id="statAvg" class="font-semibold text-white">–</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- TOOLBAR: UNIFIED SEARCH + AURA (sticky di bawah header) -->
+    <div class="sticky top-[52px] z-40 border-b border-hairline bg-white/90 backdrop-blur">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <h2 class="sr-only">Pencarian dan filter vibe</h2>
+
+        <!-- Unified Search -->
+        <div class="relative">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-inkmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+          <input id="searchInput" type="search" placeholder="Cari judul anime… (cth. Naruto)" aria-label="Cari judul anime secara langsung"
+            class="w-full rounded-card border border-hairline bg-pearl py-2.5 pl-11 pr-4 text-[15px] text-ink placeholder:text-inkmuted focus:border-actionblue focus:outline-none" />
+        </div>
+
+        <div id="auraBar" role="group" aria-label="Filter berdasarkan aura" class="mt-3 flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+          <button type="button" data-aura="" aria-pressed="true"
+            class="chip chip-active shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink/80 hover:bg-parchment hover:text-ink">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.1 6.9L21 12l-6.9 2.1L12 21l-2.1-6.9L3 12l6.9-2.1L12 3z"/></svg>
+            Semua Vibe</button>
+          <button type="button" data-aura="energy" aria-pressed="false"
+            class="chip shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink/80 hover:bg-parchment hover:text-ink">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            High Energy <span id="count-energy" class="chip-count text-inkmuted">–</span></button>
+          <button type="button" data-aura="melancholy" aria-pressed="false"
+            class="chip shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink/80 hover:bg-parchment hover:text-ink">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
+            Melancholy <span id="count-melancholy" class="chip-count text-inkmuted">–</span></button>
+          <button type="button" data-aura="binge" aria-pressed="false"
+            class="chip shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white px-4 py-2 text-[13px] font-semibold text-ink/80 hover:bg-parchment hover:text-ink">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="m17 2-5 5-5-5"/></svg>
+            Binge Mode <span id="count-binge" class="chip-count text-inkmuted">–</span></button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-3 text-[13px] text-inksecondary">
+          <p id="counter" role="status" aria-live="polite">Memuat data vibe…</p>
+          <svg id="loader" class="h-4 w-4 animate-spin text-musicred" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <section id="grid" aria-label="Grid judul anime" class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div id="resultGrid" class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" aria-busy="true"></div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyBox" class="hidden px-4 py-20 text-center" role="status">
+        <div class="mx-auto w-16 h-16 rounded-art grid place-items-center" style="background:linear-gradient(135deg,#e83273,#591962);" aria-hidden="true">
+          <svg class="text-white" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/><path d="m8.5 8.5 5 5"/><path d="m13.5 8.5-5 5"/></svg>
+        </div>
+        <h3 class="font-display text-xl font-semibold mt-4 text-ink">Tidak ada judul yang cocok</h3>
+        <p id="emptyHint" class="mt-2 text-[14px] text-inksecondary">Coba kata kunci lain atau ganti aura.</p>
+        <button id="resetBtn" type="button" class="mt-5 inline-flex items-center gap-2 rounded-pill border border-hairline bg-pearl px-5 py-2.5 text-[14px] font-semibold text-ink hover:bg-parchment transition active:scale-95">Hapus Semua Filter</button>
+      </div>
+
+      <!-- ERROR STATE -->
+      <div id="errorBox" class="hidden mx-auto max-w-xl py-16 text-center" role="alert">
+        <div class="rounded-tile border border-musicred/40 bg-parchment px-6 py-10">
+          <div class="mx-auto w-16 h-16 rounded-art grid place-items-center" style="background:linear-gradient(135deg,#fa243c,#991e2f);" aria-hidden="true">
+            <svg class="text-white" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          </div>
+          <h3 class="font-display text-xl font-semibold mt-4 text-ink">Koneksi vibe terputus</h3>
+          <p id="errorMessage" class="mt-2 text-[14px] text-ink/70"></p>
+          <p class="mt-1 text-[13px] text-inksecondary">Periksa koneksi internet, lalu coba lagi. Bila tetap gagal, kemungkinan API sedang padat atau diblokir jaringan.</p>
+          <button id="retryBtn" type="button" class="mt-6 inline-flex items-center gap-2 bg-musicred text-white rounded-pill px-6 py-2.5 text-[14px] font-semibold hover:bg-musicreddeep transition active:scale-95">Coba Lagi</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!--  FOOTER (kloningan landing page)  -->
+  <footer class="bg-parchment border-t border-hairline text-inksecondary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 text-[13px]">
+        <div class="col-span-2 lg:col-span-1">
+          <a href="index.html" class="flex items-center gap-2 text-ink" aria-label="FlipPlay — kembali ke beranda">
+            <span aria-hidden="true" class="w-7 h-7 rounded-[10px] grid place-items-center text-white font-display font-bold" style="background: linear-gradient(135deg,#fa243c,#ff4dc3 55%,#591962);">F</span>
+            <span class="font-display font-semibold text-[16px]">FlipPlay</span>
+          </a>
+          <p class="mt-3 leading-5">Platform hiburan digital generasi baru — anime, drama, manga, dan light novel dalam satu aplikasi.</p>
+        </div>
+        <nav aria-label="Jelajahi">
+          <h2 class="font-semibold text-ink text-[13px]">Jelajahi</h2>
+          <ul class="mt-3 space-y-2">
+            <li><a href="index.html#fitur" class="hover:text-ink hover:underline">Fitur</a></li>
+            <li><a href="index.html#streaming" class="hover:text-ink hover:underline">Streaming</a></li>
+            <li><a href="index.html#bacaan" class="hover:text-ink hover:underline">Bacaan</a></li>
+            <li><a href="vibe-grid.html" aria-current="page" class="hover:text-ink hover:underline">Vibe Grid</a></li>
+            <li><a href="index.html#harga" class="hover:text-ink hover:underline">Harga</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Perusahaan">
+          <h2 class="font-semibold text-ink text-[13px]">Perusahaan</h2>
+          <ul class="mt-3 space-y-2">
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Tentang kami</a></li>
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Karier</a></li>
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Kemitraan</a></li>
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Pers</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Bantuan">
+          <h2 class="font-semibold text-ink text-[13px]">Bantuan</h2>
+          <ul class="mt-3 space-y-2">
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Pusat bantuan</a></li>
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Lapor bug</a></li>
+            <li><a href="index.html#kontak" class="hover:text-ink hover:underline">Status layanan</a></li>
+            <li><a href="mailto:halo@flipplay.id" class="hover:text-ink hover:underline">halo@flipplay.id</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Legal">
+          <h2 class="font-semibold text-ink text-[13px]">Legal</h2>
+          <ul class="mt-3 space-y-2">
+            <li><a href="index.html" class="hover:text-ink hover:underline">Privasi</a></li>
+            <li><a href="index.html" class="hover:text-ink hover:underline">Syarat layanan</a></li>
+            <li><a href="index.html" class="hover:text-ink hover:underline">Kuki</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="mt-10 border-t border-hairline pt-5 text-[12px] leading-5 text-inkmuted">
+        <p>Sumber data grid: <a href="https://kitsu.app" target="_blank" rel="noopener noreferrer" class="text-actionblue hover:underline">Kitsu API</a> (kitsu.app) — diambil lewat Fetch API, tanpa server.</p>
+        <div class="mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <p>© <span id="year">2026</span> FlipPlay Labs, Malang. Tugas praktikum Pemrograman Web — Modul 1.</p>
+          <p>Muhammad Aditya Wibawa 2024-407</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ===== HEADER: MENU SELULER + TAHUN DINAMIS (event handling tambahan) =====
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const iconOpen = document.getElementById('iconOpen');
+      const iconClose = document.getElementById('iconClose');
+      menuBtn.addEventListener('click', () => {
+        const open = !mobileMenu.classList.toggle('hidden');
+        menuBtn.setAttribute('aria-expanded', String(open));
+        iconOpen.classList.toggle('hidden', open);
+        iconClose.classList.toggle('hidden', !open);
+        menuBtn.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+      });
+      mobileMenu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuBtn.setAttribute('aria-expanded', 'false');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+        menuBtn.setAttribute('aria-label', 'Buka menu navigasi');
+      }));
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // ===== KONFIGURASI =====
+      // Jikan (api.jikan.moe) tidak dapat dijangkau di banyak jaringan (host-nya sering
+      // diblokir/firewall), sehingga dipilih Kitsu — API anime publik serupa: tanpa API
+      // key, mendukung CORS, dan CDN posternya stabil.
+      const API_URL = 'https://kitsu.app/api/edge/anime?page[limit]=20&sort=-userCount&include=genres';
+      const GENRES_URL = 'https://kitsu.app/api/edge/genres?page[limit]=100'; // kamus master: id genre → nama
+
+      // Kitsu menulis format judul sebagai slug/label campuran (TV, movie, ova, dst.)
+      const SUBTYPE_NAMES = { TV: 'TV', ONA: 'ONA', OVA: 'OVA', movie: 'Movie', special: 'Special', music: 'Music' };
+
+      // Aura = "vibe" yang diterjemahkan dari genre/jumlah episode Kitsu
+      // (ikon tiap aura ada di markup chip; teks label ini dipakai untuk counter & hint)
+      const AURAS = [
+        { key: 'energy',     label: 'High Energy', genres: ['action', 'sports', 'super-power'] },
+        { key: 'melancholy', label: 'Melancholy',  genres: ['drama', 'psychological', 'mystery'] },
+        { key: 'binge',      label: 'Binge Mode',  minLength: 24 },
+      ];
+
+      const PALETTES = [
+        ['#fa243c', '#591962'], ['#0066cc', '#0d161f'], ['#e83273', '#8a1e5a'],
+        ['#dc4c24', '#991e2f'], ['#591962', '#0d161f'], ['#c00020', '#ff4dc3'],
+        ['#991e2f', '#1d1d1f'], ['#ec4899', '#591962'],
+      ];
+
+      // ===== STATE =====
+      let allAnime = [];   // cache hasil fetch, semua filter berjalan di atas data ini
+      let activeAura = null;
+      let ready = false;   // true setelah fetch sukses pertama
+
+      // ===== ELEMENT REFERENCES =====
+      const resultGrid = document.getElementById('resultGrid');
+      const emptyBox = document.getElementById('emptyBox');
+      const emptyHint = document.getElementById('emptyHint');
+      const errorBox = document.getElementById('errorBox');
+      const errorMessage = document.getElementById('errorMessage');
+      const counter = document.getElementById('counter');
+      const loader = document.getElementById('loader');
+      const searchInput = document.getElementById('searchInput');
+      const auraBar = document.getElementById('auraBar');
+      const retryBtn = document.getElementById('retryBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const statTotal = document.getElementById('statTotal');
+      const statAvg = document.getElementById('statAvg');
+
+      // ===== HELPER =====
+      // Escape teks dari API sebelum masuk innerHTML (judul/sinopsis tidak dipercaya penuh)
+      const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+
+      // Bintang kecil solid untuk badge rating kartu (pengganti emoji ⭐)
+      const STAR_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+
+      // ===== LOGIKA AURA =====
+      function matchesAura(anime, aura) {
+        if (!aura) return true;
+        if (aura.minLength) return (anime.episodes ?? 0) >= aura.minLength; // Binge Mode
+        const names = (anime.genres ?? []).map((g) => String(g.name ?? '').toLowerCase());
+        return aura.genres.some((g) => names.includes(g));
+      }
+
+      // ===== FILTER GABUNGAN (search + aura) =====
+      function getFiltered() {
+        const q = searchInput.value.trim().toLowerCase();
+        const aura = AURAS.find((a) => a.key === activeAura);
+        return allAnime.filter((anime) => {
+          const okJudul = !q ||
+            anime.title.toLowerCase().includes(q) ||
+            (anime.titleEn ?? '').toLowerCase().includes(q);
+          const okAura = matchesAura(anime, aura);
+          return okJudul && okAura;
+        });
+      }
+
+      // ===== NORMALIZER: sumber API → bentuk data internal =====
+      // UI, search, dan aura hanya mengenal bentuk internal di bawah, sehingga sumber
+      // API dapat diganti (contoh nyata: Jikan → Kitsu) tanpa menyentuh bagian lain.
+      // Catatan: `include=genres` milik Kitsu tidak selalu mengembalikan semua genre
+      // di `included[]`, makanya genre di-resolve dari endpoint katalog `/genres`.
+      function parseKitsu(animeJson, genreJson) {
+        const genreMap = new Map(
+          (genreJson.data ?? []).map((g) => [g.id, g.attributes?.name ?? g.attributes?.slug])
+        );
+        return (animeJson.data ?? []).map((item) => {
+          const a = item.attributes ?? {};
+          const genreIds = (item.relationships?.genres?.data ?? []).map((r) => r.id);
+          return {
+            id: Number(item.id) || 0,
+            title: a.canonicalTitle ?? 'Tanpa judul',
+            titleEn: a.titles?.en ?? null,
+            image: a.posterImage?.medium ?? a.posterImage?.small ?? '',
+            score: a.averageRating != null ? Math.round(parseFloat(a.averageRating)) : null, // 0–100 (%)
+            episodes: a.episodeCount ?? null,
+            year: a.startDate ? a.startDate.slice(0, 4) : null,
+            type: SUBTYPE_NAMES[a.subtype] ?? 'Anime',
+            genres: genreIds.map((id) => genreMap.get(id)).filter(Boolean).map((name) => ({ name })),
+            synopsis: a.synopsis ?? null,
+            trailer: a.youtubeVideoId ? `https://www.youtube.com/watch?v=${a.youtubeVideoId}` : null,
+          };
+        });
+      }
+
+      // ===== TEMPLATE LITERAL: kartu anime =====
+      function cardHTML(anime) {
+        const title = anime.title ?? 'Tanpa judul';
+        const img = anime.image ?? '';
+        const initial = (title.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2) || 'An').toUpperCase();
+        const [c1, c2] = PALETTES[(anime.id ?? 0) % PALETTES.length];
+        const genres = (anime.genres ?? []).slice(0, 3);
+        const meta = [anime.type, anime.year, anime.episodes ? `${anime.episodes} ep` : ''].filter(Boolean).join(' • ');
+        const synopsis = String(anime.synopsis ?? '').replace(/\[Written by MAL Rewrite\]/g, '').trim() || 'Sinopsis belum tersedia.';
+        const score = typeof anime.score === 'number' ? `${STAR_SVG} ${anime.score}%` : `${STAR_SVG} –`;
+        const imgTag = img ? `<img src="${esc(img)}" alt="Poster ${esc(title)}" loading="lazy"
+                 class="absolute inset-0 h-full w-full object-cover"
+                 onerror="this.remove()" />` : '';
+        const trailer = anime.trailer ? `
+          <a href="${esc(anime.trailer)}" target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-actionblue hover:underline underline-offset-4">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.5-6.86a1.03 1.03 0 0 0 0-1.76L9.56 4.26A1.03 1.03 0 0 0 8 5.14Z"/></svg>
+            Trailer</a>` : '';
+
+        return `
+        <article class="card-in group flex flex-col overflow-hidden rounded-card border border-hairline bg-white transition hover:-translate-y-1 hover:bg-parchment">
+          <div class="relative aspect-[3/4] overflow-hidden">
+            <div class="absolute inset-0 grid place-items-center font-display text-3xl font-bold text-white/75" style="background:linear-gradient(135deg,${c1},${c2})" aria-hidden="true">${esc(initial)}</div>
+            ${imgTag}
+            <span class="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-pill border border-hairline bg-white/90 px-2.5 py-1 text-[12px] font-semibold text-ink backdrop-blur">${score}</span>
+            <span class="absolute right-3 top-3 z-10 rounded-pill border border-hairline bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink backdrop-blur">${esc(anime.type ?? 'Anime')}</span>
+          </div>
+          <div class="flex flex-1 flex-col gap-2 p-4">
+            <h3 class="font-display text-[15px] font-semibold leading-snug line-clamp-2 text-ink" title="${esc(title)}">${esc(title)}</h3>
+            <p class="text-[12px] text-inksecondary">${esc(meta)}</p>
+            <div class="flex flex-wrap gap-1.5">
+              ${genres.map((g) => `<span class="rounded-pill border border-hairline bg-parchment px-2 py-0.5 text-[11px] text-ink/70">${esc(g.name)}</span>`).join('')}
+            </div>
+            <p class="text-[13px] leading-5 text-ink/60 line-clamp-3">${esc(synopsis)}</p>
+            <div class="mt-auto pt-1">${trailer}</div>
+          </div>
+        </article>`;
+      }
+
+      // ===== SKELETON (loading state) =====
+      const SKELETON = Array.from({ length: 10 }, () => `
+        <article class="overflow-hidden rounded-card border border-hairline bg-white">
+          <div class="aspect-[3/4] animate-pulse bg-parchment"></div>
+          <div class="space-y-2 p-4">
+            <div class="h-4 w-3/4 animate-pulse rounded bg-parchment"></div>
+            <div class="h-3 w-1/2 animate-pulse rounded bg-parchment"></div>
+            <div class="h-3 w-full animate-pulse rounded bg-parchment"></div>
+          </div>
+        </article>`).join('');
+
+      // ===== STATES =====
+      function showLoading() {
+        ready = false;
+        resultGrid.classList.remove('hidden');
+        resultGrid.setAttribute('aria-busy', 'true');
+        resultGrid.innerHTML = SKELETON;
+        emptyBox.classList.add('hidden');
+        errorBox.classList.add('hidden');
+        loader.classList.remove('hidden');
+        counter.textContent = 'Memuat data vibe…';
+      }
+
+      function render() {
+        if (!ready) return; // jangan render saat masih loading/error
+
+        const items = getFiltered();
+        const active = AURAS.find((a) => a.key === activeAura);
+        counter.textContent = `Menampilkan ${items.length} dari ${allAnime.length} judul${active ? ` • aura "${active.label}"` : ''}`;
+
+        resultGrid.classList.remove('hidden');
+        resultGrid.setAttribute('aria-busy', 'false');
+        loader.classList.add('hidden');
+
+        if (items.length === 0) {
+          resultGrid.innerHTML = '';
+          const q = searchInput.value.trim();
+          const parts = [];
+          if (q) parts.push(`kata kunci "${q}"`);
+          if (active) parts.push(`aura "${active.label}"`);
+          emptyHint.textContent = parts.length
+            ? `Tidak ada judul untuk ${parts.join(' + ')}. Coba kata lain atau ganti aura.`
+            : 'Grid masih kosong — coba muat ulang halaman.';
+          emptyBox.classList.remove('hidden');
+          return;
+        }
+
+        emptyBox.classList.add('hidden');
+        resultGrid.innerHTML = items.map(cardHTML).join('');
+      }
+
+      function showError(err) {
+        loader.classList.add('hidden');
+        counter.textContent = 'Data gagal dimuat';
+        errorMessage.textContent = `${err.message} — saat menghubungi ${API_URL.split('?')[0]}.`;
+        errorBox.classList.remove('hidden');
+        resultGrid.classList.add('hidden');
+        emptyBox.classList.add('hidden');
+      }
+
+      // ===== STATS HERO + HITUNGAN AURA (reduce) =====
+      function updateHeroStats() {
+        statTotal.textContent = String(allAnime.length);
+        const scored = allAnime.filter((a) => typeof a.score === 'number');
+        const avg = scored.reduce((sum, a) => sum + a.score, 0) / (scored.length || 1);
+        statAvg.textContent = scored.length ? `${Math.round(avg)}%` : '–';
+      }
+
+      function updateAuraCounts() {
+        // reduce: kumpulkan jumlah judul per aura dalam satu pass
+        const counts = AURAS.reduce((acc, aura) => {
+          acc[aura.key] = allAnime.reduce((n, anime) => n + (matchesAura(anime, aura) ? 1 : 0), 0);
+          return acc;
+        }, {});
+        AURAS.forEach((aura) => {
+          const el = document.getElementById(`count-${aura.key}`);
+          if (el) el.textContent = String(counts[aura.key]);
+        });
+      }
+
+      // ===== AURA TOGGLE (satu aktif, klik lagi = matikan) =====
+      function setActiveAura(key) {
+        activeAura = key;
+        document.querySelectorAll('#auraBar [data-aura]').forEach((chip) => {
+          const chipKey = chip.dataset.aura;
+          const isActive = chipKey === '' ? key === null : chipKey === key;
+          chip.classList.toggle('chip-active', isActive);
+          chip.setAttribute('aria-pressed', String(isActive));
+        });
+        render();
+      }
+
+      // ===== FETCH DATA =====
+      async function loadAnime() {
+        showLoading();
+        try {
+          // Dua fetch paralel: daftar judul populer + kamus genre (untuk resolve relasi id genre)
+          const [animeRes, genreRes] = await Promise.all([
+            fetch(API_URL),
+            fetch(GENRES_URL),
+          ]);
+          if (!animeRes.ok) throw new Error(`HTTP ${animeRes.status} ${animeRes.statusText}`);
+          if (!genreRes.ok) throw new Error(`HTTP ${genreRes.status} pada katalog genre`);
+          const animeJson = await animeRes.json();
+          const genreJson = await genreRes.json();
+          allAnime = parseKitsu(animeJson, genreJson);
+          if (allAnime.length === 0) throw new Error('API dijangkau, tetapi tidak mengembalikan data');
+
+          ready = true;
+          loader.classList.add('hidden');
+          updateHeroStats();
+          updateAuraCounts();
+          render();
+        } catch (err) {
+          showError(err);
+        }
+      }
+
+      // ===== EVENT HANDLING =====
+      // 5) input — unified search real-time, mengfilter judul card saat mengetik
+      searchInput.addEventListener('input', render);
+
+      // 6) click — toggle aura (event delegation di bar chip)
+      auraBar.addEventListener('click', (e) => {
+        const chip = e.target.closest('button[data-aura]');
+        if (!chip) return;
+        const key = chip.dataset.aura;
+        setActiveAura(key === '' ? null : (activeAura === key ? null : key));
+      });
+
+      // 7) click — retry saat fetch gagal
+      retryBtn.addEventListener('click', loadAnime);
+
+      // 8) click — reset semua filter dari empty state
+      resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        setActiveAura(null);
+        searchInput.focus();
+      });
+
+      // ===== MULAI =====
+      loadAnime();
+    })();
+  </script>
+</body>
+</html>
